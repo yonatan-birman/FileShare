@@ -1,16 +1,19 @@
 #include "client.h"
-//#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <WS2tcpip.h>
+#include "global.h"
 //#pragma comment(lib,"ws2_32.lib") //Winsock Library
 //#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 void WINAPI start_client() {
-	const char* scan = "scan", *scan_desc = "scan for live servers";//is it like char[]?
-	const char* send = "send ", *send_desc = "send [ip] [file path]";
-	const char* end_program = "exit", *end_program_desc = "end program";
-	const char* help = "help", *help_desc = "show options";
+	const char* const scan = "scan", *scan_desc = "scan for live servers";
+	const char* const send = "send ", *send_desc = "send [ip] [file path]";
+	const char* const end_program = "exit", *end_program_desc = "end program";
+	const char* const help = "help", *help_desc = "show options";
 
-	int space2_index;
-
+	int space2index;
 
 	SOCKET udp_sockfd = creat_client_udp_socket();
 	char com[100] = { 0 };
@@ -20,7 +23,6 @@ void WINAPI start_client() {
 		if (!server_mode) {		
 			memset(com, 0, sizeof(com));
 			printf_s("enter commnad: ");
-			//scanf_s("%sockfd", com, _countof(com));//does it matter if i dont write "%9s"?
 			fgets(com, sizeof(com), stdin);
 			com[strlen(com) - 1] = '\0';
 			if (strcmp(com, end_program) == 0) {
@@ -30,13 +32,13 @@ void WINAPI start_client() {
 				scan_for_servers(udp_sockfd);
 			}
 			else if (strncmp(com, send, 5) == 0) {
-				puts("trying to send file");
-				space2_index = nspace_index(com, 2);
-				com[space2_index] = '\0';
-				send_file(&com[5], &com[space2_index + 1]);
+				puts("sending file...");
+				space2index = nspace_index(com, 2);
+				com[space2index] = '\0';
+				send_file(&com[5], &com[space2index + 1]);
 			}
 			else if (strcmp(com, help) == 0) {
-				printf_s("options:\n%s - %s\n%s - %s\n%s - %s\n%s - %s\n",
+				printf_s("options:\n%s - %s\n%s- %s\n%s - %s\n%s - %s\n",
 					scan, scan_desc, send, send_desc, end_program, end_program_desc, help, help_desc);
 			}
 			//printf_s("command: %s.\n", com);
@@ -64,9 +66,9 @@ SOCKET creat_client_tcp_socket() {
 	//Create a socket
 	if ((s = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 	{
-		printf("Could not create socket : %d", WSAGetLastError());
+		printf_s("Could not create socket : %d", WSAGetLastError());
 	}
-	printf("Socket created.\n");
+	//printf_s("DEBUG: Socket created.\n");
 	return s;
 }
 
@@ -87,10 +89,10 @@ void send_file(char ip[], char path[]) {
 	if (connect(sockfd, (struct sockaddr*) & server, sizeof(server)) < 0)
 	{
 		puts("connect error");
-		return 1;
+		return;
 	}
 
-	puts("Connected");
+	//puts("DEBUG: Connected");
 
 	//Send some data
 
@@ -102,13 +104,13 @@ void send_file(char ip[], char path[]) {
 		return;
 	}
 
-	printf("content of this file: \n");
+	printf_s("content of this file: \n");
 
 	// Printing what is written in file
 	// character by character using loop.
 	for (i = 0; c != EOF && i < size - 1; i++) {
 		c = fgetc(ptr);
-		printf("%c", c);
+		printf_s("%c", c);
 		buffer[i] = c;
 	}
 	puts("");
@@ -119,7 +121,7 @@ void send_file(char ip[], char path[]) {
 	if (send(sockfd, buffer, strlen(buffer), 0) < 0)
 	{
 		puts("Send failed");
-		return 1;
+		return;
 	}
 	puts("Data Sent");
 
@@ -128,11 +130,11 @@ void send_file(char ip[], char path[]) {
 	{
 		puts("recv failed");
 	}
-	puts("Reply received:");
 
 	//Add a NULL terminating character to make it a proper string before printing
 	buffer[recv_size] = '\0';
-	puts(buffer);
+	printf_s("Reply from server: %s\n", buffer);
+
 	closesocket(sockfd);
 
 }
@@ -145,7 +147,7 @@ SOCKET creat_client_udp_socket() {
 		perror("socket creation failed");
 		exit(EXIT_FAILURE);
 	}
-	else printf("socket: %d\n", sockfd);
+	//printf_s("DEBUG: socket: %d\n", sockfd);
 
 
 	tv.tv_sec = 1;//why isnt it realy a second?
@@ -157,8 +159,8 @@ SOCKET creat_client_udp_socket() {
 }
 
 void scan_for_servers(SOCKET sockfd) {
-	const char* search_massage = "someone here?";
-	const char* answer_massage = "im here!";
+	const char* const search_massage = "someone here?";
+	const char* const answer_massage = "im here!";
 	int len, n;
 	char buffer[size];
 	struct sockaddr_in broadcastaddr;
@@ -166,11 +168,11 @@ void scan_for_servers(SOCKET sockfd) {
 	ZeroMemory(&broadcastaddr, sizeof(broadcastaddr));
 	broadcastaddr.sin_family = AF_INET;
 	broadcastaddr.sin_port = htons(UDP_PORT);
-	inet_pton(AF_INET, "192.168.1.255", &broadcastaddr.sin_addr);
+	inet_pton(AF_INET, "192.168.1.255", &broadcastaddr.sin_addr);//should make this generic
 
 	int sendOk = sendto(sockfd, search_massage, strlen(search_massage) + 1, 0, (struct sockaddr*) & broadcastaddr, sizeof(broadcastaddr));
 	if (sendOk == SOCKET_ERROR) {
-		printf("that didnt work: %d\n", WSAGetLastError());
+		printf_s("that didnt work: %d\n", WSAGetLastError());
 	}
 
 	while (1)
@@ -180,17 +182,16 @@ void scan_for_servers(SOCKET sockfd) {
 		ZeroMemory(&broadcastaddr, sizeof(broadcastaddr));
 		n = recvfrom(sockfd, (char*)buffer, sizeof(buffer) - 1, /*MSG_WAITALL*/ /*MSG_PEEK*/ 0, (struct sockaddr*) & broadcastaddr, &len);//is it ok sizeof(buffer)-1?
 		if (n == -1) {
-			perror("Recvfrom timeout");//how does perror work??
-			return 1;
+			//perror("DEBUG: Recvfrom timeout");
+			return;
 		}
 		buffer[n] = '\0';
 		if (strcmp(buffer, answer_massage) == 0) {
 			char tmp[30];
 			inet_ntop(AF_INET, &(broadcastaddr.sin_addr), tmp, INET_ADDRSTRLEN);
-			printf("server alive at: %s\n", tmp);
-			//add tmp to some kind of a list
+			printf_s("server alive at: %s\n", tmp);
 		}
 		else
-			printf("%s", buffer);
+			printf_s("%s", buffer);
 	}
 }

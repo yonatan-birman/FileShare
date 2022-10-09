@@ -1,10 +1,11 @@
 #include "server.h"
 #include "client.h"
+#include <stdio.h>
 #pragma comment(lib,"ws2_32.lib")
-void initialiseWinsock();
+void initialise_winsock();
 
 int main() {
-	initialiseWinsock();
+	initialise_winsock();
 
 	SOCKET udp_sockfd = creat_udp_server();
 	SOCKET tcp_sockfd = creat_tcp_server();
@@ -15,14 +16,14 @@ int main() {
 }
 
 
-void initialiseWinsock() {
+void initialise_winsock() {
 	WSADATA wsa;
 	//Initialise winsock
-	printf("\nInitialising Winsock...");
+	//printf_s("DEBUG: Initialising Winsock...");
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 	{
-		printf("Failed. Error Code : %d", WSAGetLastError());
+		fprintf_s(stderr, "Failed. Error Code : %d", WSAGetLastError());
 		exit(EXIT_FAILURE);
 	}
-	printf("Initialised.\n");
+	//printf_s("DEBUG: Initialised.\n");
 }
