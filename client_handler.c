@@ -52,7 +52,7 @@ void WINAPI handle_tcp_clients(SOCKET sockfd) {
 		new_socket = accept(sockfd, (struct sockaddr*) & client, &len);
 		if (new_socket == INVALID_SOCKET)
 		{
-			printf_s("accept failed with error code : %d", WSAGetLastError());
+			printf_s("Accept failed with error code : %d", WSAGetLastError());
 		}
 
 		//puts("DEBUG: Connection accepted");
@@ -60,7 +60,7 @@ void WINAPI handle_tcp_clients(SOCKET sockfd) {
 		memset(buffer, 0, size);
 		if ((recv_size = recv(new_socket, buffer, size, 0)) == SOCKET_ERROR)
 		{
-			puts("recv failed");
+			puts("Recv failed");
 			exit(0);
 		}
 		buffer[recv_size - 1] = '\0';
@@ -77,7 +77,7 @@ void WINAPI handle_tcp_clients(SOCKET sockfd) {
 			ans[1] = '\0';
 			*ans = tolower(*ans);
 			if (strcmp("y", ans) == 0) {
-				printf_s("what would you like to name the file? \n");
+				printf_s("What would you like to name the file? \n");
 				scanf_s("%s", ans, _countof(ans));
 				if (fopen_s(&f, ans, "w") == 0) {
 					fwrite(buffer, sizeof(char), strlen(buffer), f);

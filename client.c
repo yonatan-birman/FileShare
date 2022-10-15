@@ -22,7 +22,7 @@ void WINAPI start_client() {
 	while (1) {
 		if(!server_mode) {		
 			memset(com, 0, sizeof(com));
-			printf_s("enter command: ");
+			printf_s("Command: ");
 			fgets(com, sizeof(com), stdin);
 			com[strlen(com) - 1] = '\0';
 			if (strcmp(com, end_program) == 0) {
@@ -32,13 +32,13 @@ void WINAPI start_client() {
 				scan_for_servers(udp_sockfd);
 			}
 			else if (strncmp(com, send, 5) == 0) {
-				puts("sending file...");
+				puts("Sending file...");
 				space2index = nspace_index(com, 2);
 				com[space2index] = '\0';
 				send_file(&com[5], &com[space2index + 1]);
 			}
 			else if (strcmp(com, help) == 0) {
-				printf_s("options:\n%s - %s\n%s- %s\n%s - %s\n%s - %s\n",
+				printf_s("Options:\n%s - %s\n%s- %s\n%s - %s\n%s - %s\n",
 					scan, scan_desc, send, send_desc, end_program, end_program_desc, help, help_desc);
 			}
 			//printf_s("DEBUG: command: %s.\n", com);
@@ -99,12 +99,12 @@ void send_file(char ip[], char path[]) {
 	fopen_s(&ptr, path, "r");
 
 	if (NULL == ptr) {
-		printf_s("file: \"%s\" can't be opened \n", path);
+		printf_s("File: \"%s\" can't be opened \n", path);
 		closesocket(sockfd);
 		return;
 	}
 
-	printf_s("content of this file: \n");//for smaller files
+	printf_s("Content of this file: \n");//for smaller files
 
 	// Printing what is written in file
 	// character by character using loop.
@@ -129,7 +129,7 @@ void send_file(char ip[], char path[]) {
 	//Receive a reply from the server
 	if ((recv_size = recv(sockfd, buffer, size - 1, 0)) == SOCKET_ERROR)
 	{
-		puts("recv failed");
+		puts("Recv failed");
 		closesocket(sockfd);
 		return;
 	}
@@ -147,7 +147,7 @@ SOCKET creat_client_udp_socket() {
 	struct timeval tv;
 
 	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-		perror("socket creation failed");
+		perror("Socket creation failed");
 		exit(EXIT_FAILURE);
 	}
 	//printf_s("DEBUG: socket: %d\n", sockfd);
@@ -176,7 +176,7 @@ void scan_for_servers(SOCKET sockfd) {
 
 	int sendOk = sendto(sockfd, search_massage, strlen(search_massage) + 1, 0, (struct sockaddr*) & broadcastaddr, sizeof(broadcastaddr));
 	if (sendOk == SOCKET_ERROR) {
-		printf_s("that didnt work: %d\n", WSAGetLastError());
+		printf_s("That didnt work: %d\n", WSAGetLastError());
 	}
 
 	while (1){
@@ -192,7 +192,7 @@ void scan_for_servers(SOCKET sockfd) {
 		if (strcmp(buffer, answer_massage) == 0) {
 			char tmp[30];
 			inet_ntop(AF_INET, &(broadcastaddr.sin_addr), tmp, INET_ADDRSTRLEN);
-			printf_s("server alive at: %s\n", tmp);
+			printf_s("Server alive at: %s\n", tmp);
 		}
 		else
 			printf_s("%s", buffer);

@@ -15,7 +15,7 @@ int creat_udp_server() {
 	
 	// Creating socket file descriptor 
 	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-		fprintf_s(stderr, "socket creation failed\n");
+		fprintf_s(stderr, "Socket creation failed\n");
 		exit(1);
 	}
 
@@ -29,7 +29,7 @@ int creat_udp_server() {
 	// Bind the socket with the server address 
 	if (bind(sockfd, (const struct sockaddr*) & servaddr, sizeof(servaddr)) < 0)
 	{
-		fprintf_s(stderr, "bind failed\n");
+		fprintf_s(stderr, "Bind failed\n");
 		exit(1);
 	}
 	//puts("DEBUG: bind succided");
@@ -45,7 +45,7 @@ int creat_tcp_server()
 	//Create a socket
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 	{
-		fprintf_s(stderr, "socket creation failed\n");
+		fprintf_s(stderr, "Socket creation failed\n");
 		exit(1);
 	}
 	//puts("DEBUG: Socket created");
