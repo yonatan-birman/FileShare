@@ -5,7 +5,7 @@
 #include <WS2tcpip.h>
 #include "global.h"
 //#pragma comment(lib,"ws2_32.lib") //Winsock Library
-//#define _WINSOCK_DEPRECATED_NO_WARNINGS
+//#define _WINSOCK_DEPRECATED_NO_WARNINGS //for debuging purposes
 
 void WINAPI start_client() {
 	const char* const scan = "scan", *scan_desc = "scan for live servers";
@@ -20,9 +20,9 @@ void WINAPI start_client() {
 	server_mode = 0;
 
 	while (1) {
-		if (!server_mode) {		
+		if(!server_mode) {		
 			memset(com, 0, sizeof(com));
-			printf_s("enter commnad: ");
+			printf_s("enter command: ");
 			fgets(com, sizeof(com), stdin);
 			com[strlen(com) - 1] = '\0';
 			if (strcmp(com, end_program) == 0) {
@@ -41,7 +41,7 @@ void WINAPI start_client() {
 				printf_s("options:\n%s - %s\n%s- %s\n%s - %s\n%s - %s\n",
 					scan, scan_desc, send, send_desc, end_program, end_program_desc, help, help_desc);
 			}
-			//printf_s("command: %s.\n", com);
+			//printf_s("DEBUG: command: %s.\n", com);
 		}
 	}
 	closesocket(udp_sockfd);
@@ -67,6 +67,7 @@ SOCKET creat_client_tcp_socket() {
 	if ((s = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 	{
 		printf_s("Could not create socket : %d", WSAGetLastError());
+		exit(1);
 	}
 	//printf_s("DEBUG: Socket created.\n");
 	return s;
@@ -89,28 +90,27 @@ void send_file(char ip[], char path[]) {
 	if (connect(sockfd, (struct sockaddr*) & server, sizeof(server)) < 0)
 	{
 		puts("connect error");
+		closesocket(sockfd);
 		return;
 	}
-
 	//puts("DEBUG: Connected");
-
-	//Send some data
 
 	// Opening file in reading mode
 	fopen_s(&ptr, path, "r");
 
 	if (NULL == ptr) {
 		printf_s("file: \"%s\" can't be opened \n", path);
+		closesocket(sockfd);
 		return;
 	}
 
-	printf_s("content of this file: \n");
+	printf_s("content of this file: \n");//for smaller files
 
 	// Printing what is written in file
 	// character by character using loop.
 	for (i = 0; c != EOF && i < size - 1; i++) {
 		c = fgetc(ptr);
-		printf_s("%c", c);
+		printf_s("%c", c);//for smaller files
 		buffer[i] = c;
 	}
 	puts("");
@@ -121,6 +121,7 @@ void send_file(char ip[], char path[]) {
 	if (send(sockfd, buffer, strlen(buffer), 0) < 0)
 	{
 		puts("Send failed");
+		closesocket(sockfd);
 		return;
 	}
 	puts("Data Sent");
@@ -129,6 +130,8 @@ void send_file(char ip[], char path[]) {
 	if ((recv_size = recv(sockfd, buffer, size - 1, 0)) == SOCKET_ERROR)
 	{
 		puts("recv failed");
+		closesocket(sockfd);
+		return;
 	}
 
 	//Add a NULL terminating character to make it a proper string before printing
@@ -154,6 +157,7 @@ SOCKET creat_client_udp_socket() {
 	tv.tv_usec = 0;
 	if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
 		perror("Error");
+		exit(1);
 	}
 	return sockfd;
 }
@@ -175,14 +179,13 @@ void scan_for_servers(SOCKET sockfd) {
 		printf_s("that didnt work: %d\n", WSAGetLastError());
 	}
 
-	while (1)
-	{
+	while (1){
 		len = sizeof(broadcastaddr);
 		ZeroMemory(buffer, size);
 		ZeroMemory(&broadcastaddr, sizeof(broadcastaddr));
-		n = recvfrom(sockfd, (char*)buffer, sizeof(buffer) - 1, /*MSG_WAITALL*/ /*MSG_PEEK*/ 0, (struct sockaddr*) & broadcastaddr, &len);//is it ok sizeof(buffer)-1?
+		n = recvfrom(sockfd, (char*)buffer, sizeof(buffer) - 1, /*MSG_WAITALL*/ /*MSG_PEEK*/ 0, (struct sockaddr*) & broadcastaddr, &len);
 		if (n == -1) {
-			//perror("DEBUG: Recvfrom timeout");
+			//printf_s("DEBUG: Recvfrom timeout");
 			return;
 		}
 		buffer[n] = '\0';

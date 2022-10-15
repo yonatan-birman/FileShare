@@ -10,8 +10,9 @@ int main() {
 	SOCKET udp_sockfd = creat_udp_server();
 	SOCKET tcp_sockfd = creat_tcp_server();
 
-	//start_client();
+	//starting client at a new thread
 	HANDLE thread = CreateThread(NULL, 0, start_client, NULL, 0, NULL);
+	//starting server at current thread
 	start_server(udp_sockfd, tcp_sockfd);
 }
 

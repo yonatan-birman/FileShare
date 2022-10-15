@@ -32,7 +32,7 @@ int creat_udp_server() {
 		fprintf_s(stderr, "bind failed\n");
 		exit(1);
 	}
-	//printf("bind succided\n");
+	//puts("DEBUG: bind succided");
 	return sockfd;
 }
 
@@ -48,7 +48,7 @@ int creat_tcp_server()
 		fprintf_s(stderr, "socket creation failed\n");
 		exit(1);
 	}
-	//printf_s("DEBUG: Socket created\n");
+	//puts("DEBUG: Socket created");
 
 	//Prepare the sockaddr_in structure
 	server.sin_family = AF_INET;
