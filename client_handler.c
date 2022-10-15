@@ -69,7 +69,7 @@ void WINAPI handle_tcp_clients(SOCKET sockfd) {
 		//need to stop client thread here
 
 		inet_ntop(AF_INET, &(client.sin_addr), ip, INET_ADDRSTRLEN);
-		printf_s("ip: %s sent you a file, press y to save it or n to dismiss: ", ip);
+		printf_s("\nip: %s sent you a file, press y to save it or n to dismiss: ", ip);
 		while(server_mode) {
 			//scanf_s("%s", ans, _countof(ans));
 			//getchar();
@@ -84,6 +84,7 @@ void WINAPI handle_tcp_clients(SOCKET sockfd) {
 					fclose(f);
 					server_mode = 0;
 				}
+
 			}
 			else if (strcmp("n", ans) == 0) {
 				puts("OK, file dismissed");
