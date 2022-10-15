@@ -2,7 +2,7 @@
 Share files in your local network!  
 
 This code allows you to send and recive files from your local network computers.  
-In the example below, you can see how the client interactes with the program:
+In the example below, you can see how the client interacts with the program:
 
 To see the command options we write "help", now we scan our local network for live servers using udp protocol.  
 After scanning the net, we choose one of the live servers we want to interact with and send it a file using tcp protocol.      
