@@ -1,8 +1,8 @@
 # File Share <a href="https://emoji.gg/emoji/1261-hackerbongocat"><img src="https://cdn3.emoji.gg/emojis/1261-hackerbongocat.gif" width="46px" height="46px" alt="HackerBongoCat"></a>
 Share files in your local network!  
-This code allows you to send and receive files from your local network computers.  
+This program, written in C for Windows, allows you to send and receive files to/from your local network computers.  
 ## How to use: <a href="https://emoji.gg/emoji/8007-kirbylink"><img src="https://cdn3.emoji.gg/emojis/8007-kirbylink.gif" width="46px" height="46px" alt="KirbyLink"></a>
-In the example below, you can see how the client interacts with the program:
+In the example below, you can see how the client interacts with the program:  
 To see the command options we write "help", now we scan our local network for live servers using udp protocol.  
 After scanning the net, we choose one of the live servers we want to interact with and send it a file using tcp protocol.      
 
