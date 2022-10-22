@@ -10,19 +10,18 @@ int main() {
 	SOCKET udp_sockfd = creat_udp_server();
 	SOCKET tcp_sockfd = creat_tcp_server();
 
-	//starting client at a new thread
+	// Starting client at a new thread
 	HANDLE thread = CreateThread(NULL, 0, start_client, NULL, 0, NULL);
-	//starting server at current thread
+	// Starting server at the current thread
 	start_server(udp_sockfd, tcp_sockfd);
 }
 
 
 void initialise_winsock() {
 	WSADATA wsa;
-	//Initialise winsock
+	// Initialise winsock
 	//printf_s("DEBUG: Initialising Winsock...");
-	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-	{
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
 		fprintf_s(stderr, "Failed. Error Code : %d", WSAGetLastError());
 		exit(EXIT_FAILURE);
 	}
